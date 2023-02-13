@@ -1,0 +1,39 @@
+version: '3'
+
+services:
+
+  wordpress:
+    image: wordpress
+    container_name: app_wordpress_web
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: exampleuser
+      WORDPRESS_DB_PASSWORD: examplepass
+      WORDPRESS_DB_NAME: exampledb
+    volumes:
+      - ./app:/var/www/html
+    networks:
+      - traefik
+      - database
+    labels:
+      - "traefik.http.routers.wordpress.rule=Host(`wordpress.docker.localhost`)"
+    depends_on:
+      - db
+
+  db:
+    image: mysql:5.7
+    container_name: app_wordpress_db
+    environment:
+      MYSQL_DATABASE: exampledb
+      MYSQL_USER: exampleuser
+      MYSQL_PASSWORD: examplepass
+      MYSQL_RANDOM_ROOT_PASSWORD: '1'
+    volumes:
+      - ./db:/var/lib/mysql
+    networks:
+      - database
+
+networks:
+  traefik:
+    external: true
+  database:
